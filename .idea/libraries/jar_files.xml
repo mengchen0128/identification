@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="jar_files">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Desktop/java/jar_files" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <excluded>
+      <root url="jar://$USER_HOME$/Desktop/java/jar_files/jfxrt.jar!/" />
+    </excluded>
+    <jarDirectory url="file://$USER_HOME$/Desktop/java/jar_files" recursive="false" />
+  </library>
+</component>

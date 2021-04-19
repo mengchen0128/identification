@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="identification:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/identification_jar</output-path>
+    <root id="archive" name="identification.jar">
+      <element id="module-output" name="identification" />
+    </root>
+  </artifact>
+</component>
