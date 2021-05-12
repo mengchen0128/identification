@@ -1,12 +1,13 @@
 package sample;
 
+import com.jfoenix.controls.*;
+import com.jfoenix.svg.SVGGlyphLoader;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -21,37 +22,106 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.controlsfx.control.BreadCrumbBar;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 import java.io.File;
+import java.io.IOException;
 
 import static javafx.scene.layout.BorderStrokeStyle.SOLID;
 
 public class LayOut extends Application {
+    public static  JFXTabPane  tabPane;
+    private JFXListView<Label> listview2;
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Register a custom default font
-        GlyphFontRegistry.register("icomoon", org.controlsfx.samples.HelloGlyphFont.class.getResourceAsStream("icomoon.ttf") , 16);
+
+        new Thread(() -> {
+            try {
+                SVGGlyphLoader.loadGlyphsFont(LayOut.class.getResourceAsStream("/fonts/icon_font/iconfont.svg"),
+                        ApplicatonStore.ICON_FONT_KEY);
+
+            } catch (IOException ioExc) {
+                ioExc.printStackTrace();
+            }
+        }).start();
+
+
+        /**
+         * 按钮
+         */
+        JFXButton push = new JFXButton("Raised Button".toUpperCase());
+        push.getStylesheets().add("/css/button.css");
+        push.getStyleClass().add("button-raised");
+
+     //   Button push = new Button("Push Me!");
+        push.setOnAction(new ButtonHandler());
+
         /**
          * 组件布局-文本框
          */
-        TextArea textArea = new TextArea();
-        Border bor = new Border(new BorderStroke(Paint.valueOf("#1C1C1C"), SOLID, new CornerRadii(1), new BorderWidths(1)));
-        textArea.setBorder(bor);
+    //    JFXTextArea textArea=new JFXTextArea();
+       TextArea textArea = new TextArea();
+/*        Border bor = new Border(new BorderStroke(Paint.valueOf("#1C1C1C"), SOLID, new CornerRadii(1), new BorderWidths(1)));
+        textArea.setBorder(bor);*/
 
         /**
          * 工具栏
          */
-
-        GlyphFont1 glyphFont11 =new GlyphFont1();
+        JFXButton homeButton=new JFXButton();
+        homeButton.setGraphic(SVGGlyphLoader.getIcoMoonGlyph(ApplicatonStore.ICON_FONT_KEY + ".home-outline"));
+        homeButton.getStyleClass().add("tool-bar-button");
         /**
-         * 树
+         * 列表
          */
-        TreeView<String> treeview = new TreeView<>();
+        JFXListView<Object> listview = new JFXListView<>();
+        listview2 = new JFXListView<>();
+   //     ObservableList<Label> List = FXCollections.observableArrayList();
+         //for(int i = 0 ; i < 4 ; i++)
+      //     listview.getItems().add(new Label("Item " + i));
+     //   ObservableList<Label> List2 = FXCollections.observableArrayList();
+        Label label1=new Label("主页");
+        Label label2=new Label("主页");
+        Label label3=new Label("主页");
+        Label label4=new Label("参数辨识");
+        label4.setGraphic(SVGGlyphLoader.getIcoMoonGlyph(ApplicatonStore.ICON_FONT_KEY + ".taiyang"));
+        Label label5=new Label("参数辨识");
+        label5.setGraphic(SVGGlyphLoader.getIcoMoonGlyph(ApplicatonStore.ICON_FONT_KEY + ".jiankong"));
 
-        TreeItem<String> root = new TreeItem<>("主目录");
 
+    //    List.addAll(label1,label2,label3);
+
+
+    //    listview2.setItems(List);
+        listview2.getItems().addAll(label1,label2,label3);
+        listview2.getStyleClass().add("sublist");
+        listview2.setGroupnode(label5);
+        listview.getItems().addAll(label4,listview2);
+        listview.getStyleClass().add("navigation-list");
+
+        listview.getSelectionModel().clearAndSelect(0);
+        listview.expandedProperty().set(true);
+        listview2.getSelectionModel().selectedItemProperty().addListener( (observable, oldValue, newValue) -> {
+            if(newValue==null)
+            {
+                return;
+            }
+            tabPane.getTabs().add(new Tab( newValue.getText()));
+
+        });
+
+     //   TreeView<String> treeview = new TreeView<>();
+        JFXTreeView<String> treeView=new JFXTreeView<>();
+
+/*        treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            sampleBreadCrumbBar.selectedCrumbProperty().set(newValue);
+            if (currentSelectItem != null && currentSelectItem.getValue() .equals("三级目录")) {
+                System.out.println("selection(" + ((TreeItem<String>) newValue).getValue() + ") change");
+                tabPane.getSelectionModel().select(tab1);
+            }
+        });*/
+
+
+/*
+       TreeItem<String> root = new TreeItem<>("主目录");
         TreeItem<String> cell1 = new TreeItem<>("二级目录");
         TreeItem<String> cell2 = new TreeItem<>("三级目录");
         TreeItem<String> cell3 = new TreeItem<>("三级目录");
@@ -72,45 +142,64 @@ public class LayOut extends Application {
         NodeBuilder.addToList(cell5,cell6, cell7, cell8);
         NodeBuilder.addToList(cell9,cell10, cell11, cell12);
         NodeBuilder.addToList(root,cell1, cell5, cell9);
-        root.setExpanded(true);
+        root.setExpanded(true);*/
 
         /**
-         * 导航栏
+         * 工具
          */
         Pane pane = new Pane();
-      //  BreadCrumbBar.getPanel(pane,root);
-        BreadCrumbBar  sampleBreadCrumbBar=new BreadCrumbBar(root);
+        pane.getStyleClass().add("tool-pane");
+        pane.getChildren().add(homeButton);
+        //BreadCrumbBar  sampleBreadCrumbBar=new BreadCrumbBar(root);
      //   new Thread(() -> breadCrumbBar.getPanel(pane)).start();
     //    sampleBreadCrumbBar.setSelectedCrumb(model);
-        sampleBreadCrumbBar.getStylesheets().add("/css/breadcrumbbar.css");
-        pane.getChildren().add(sampleBreadCrumbBar);
+      //  sampleBreadCrumbBar.getStylesheets().add("/css/breadcrumbbar.css");
+      //  pane.getChildren().add(sampleBreadCrumbBar);
         /**
         * 选项卡
         */
 
-        TabPane tabPane = new TabPane();
+        //TabPane tabPane = new TabPane();
+         tabPane = new JFXTabPane();
+         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 
-        tabPane.setStyle("-fx-background-color: #ffffff");
-
-        Tab tab1 = new Tab("选项卡 1");
-        Tab tab2 = new Tab("选项卡 2");
-        Tab tab3 = new Tab("选项卡 3");
-        Tab tab4 = new Tab("选项卡 4");
+        Tab tab1 = new Tab("主页");
+        tab1.setClosable(false);
+        tab1.setGraphic(SVGGlyphLoader.getIcoMoonGlyph(ApplicatonStore.ICON_FONT_KEY + ".home-outline"));
+       // tab1.getStyleClass().addAll("tab-content");
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.TOP_LEFT);
-        Button vbutton2 = new Button("开始绘图");
-        Button vbutton=new Button("选择文件");
+        JFXButton vbutton2 = new JFXButton("开始绘图");
+        JFXButton vbutton=new JFXButton("选择文件");
+
+
+
         final ObservableList strings = FXCollections.observableArrayList(
                 "算法 1", "算法 2", "算法 3");
             //Non-editable combobox. Created with a builder
         ComboBox uneditableComboBox = new ComboBox();
-        uneditableComboBox.setPromptText("Make a choice...");
-        uneditableComboBox.setItems(FXCollections.observableArrayList(strings.subList(0, 3)));
-        vbox.getChildren().addAll(vbutton,uneditableComboBox,vbutton2);
+/*        uneditableComboBox.setPromptText("Make a choice...");
+        uneditableComboBox.setItems(FXCollections.observableArrayList(strings.subList(0, 3)));*/
+
+        JFXComboBox<String> jfxCombo = new JFXComboBox<>();
+
+/*      jfxCombo.getItems().add(new Label("算法 1"));
+        jfxCombo.getItems().add(new Label("算法 2"));
+        jfxCombo.getItems().add(new Label("算法 3"));
+        jfxCombo.getItems().add(new Label("算法 4"));*/
+
+        jfxCombo.setItems(FXCollections.observableArrayList(strings.subList(0, 3)));
+        jfxCombo.setPromptText("Make a choice...");
+
+        vbox.getChildren().addAll(vbutton,jfxCombo,vbutton2,push);
         tab1.setContent(vbox);
 
-        tabPane.getTabs().addAll(tab1, tab2, tab3, tab4);
+        tabPane.getTabs().addAll(tab1);
 
+
+        /**
+         * 菜单
+         */
         MenuBar menubar = new MenuBar();
         Menu menu1 = new Menu("文件");
         Menu menu2 = new Menu("编辑");
@@ -157,31 +246,43 @@ public class LayOut extends Application {
         menu8.getItems().addAll(item8, item9);
         menubar.getMenus().addAll(menu1, menu2, menu3, menu4, menu5, menu6, menu7);
 
+/**
+ * 表
+ */
+
+        TableView tableView=new TableView();
+
+
 
         AnchorPane an = new AnchorPane();
-        Scene scene = new Scene(an);
+        JFXDecorator wfxDecorator = new JFXDecorator(primaryStage,an);
+
+        Scene scene = new Scene(wfxDecorator);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("参数辨识起步");
+        primaryStage.setTitle("参数辨识");
         primaryStage.setHeight(1000);
         primaryStage.setWidth(1200);
         primaryStage.setResizable(true);
         primaryStage.show();
 
 
+        scene.getStylesheets().add( "/css/app-light.css");
+
 
         VBox vbox1=new VBox();
         StackPane top=new StackPane();
         top.prefWidthProperty().bind(an.widthProperty());
-        top.setPrefHeight(50);
         VBox vbox2=new VBox();
         BorderPane borderPane=new BorderPane();
 
         vbox2.getChildren().addAll(menubar,borderPane);
 
-        glyphFont11.getPanel(borderPane);
+
 
         borderPane.setLeft(pane);
 
+        Border bor = new Border(new BorderStroke(Paint.valueOf("#DCDCDC"), SOLID, new CornerRadii(1), new BorderWidths(1)));
+        borderPane.setBorder(bor);
         top.getChildren().addAll(vbox2);
 
 
@@ -190,12 +291,12 @@ public class LayOut extends Application {
         bottom.getItems().add(textArea);
         bottom.prefWidthProperty().bind(an.widthProperty());
         bottom.setPrefHeight(300);
-        bottom.setStyle("-fx-background-color: #00FFFF");
+  //      bottom.setStyle("-fx-background-color: #00FFFF");
 
         SplitPane middle=new SplitPane();
         middle.prefWidthProperty().bind(an.widthProperty());
         middle.prefHeightProperty().bind(an.heightProperty().subtract(top.getPrefHeight()+bottom.getPrefHeight()));
-        middle.setStyle("-fx-background-color: #1E90FF");
+    //    middle.setStyle("-fx-background-color: #1E90FF");
 
         splitPane.getItems().addAll(middle,bottom);
         splitPane.setOrientation(Orientation.VERTICAL);
@@ -205,19 +306,30 @@ public class LayOut extends Application {
         StackPane left=new StackPane();
 
         left.prefHeightProperty().bind(middle.prefHeightProperty());
-        left.setStyle("-fx-background-color: #FFB6C1");
-        left.getChildren().addAll(treeview);
+     //   left.setStyle("-fx-background-color: #FFB6C1");
+
+
+        left.getChildren().addAll(listview);
+
+
+/*        JFXDrawersStack jfxDrawersStack=new JFXDrawersStack();
+        jfxDrawersStack.setContent(tabPane);
+        jfxDrawersStack.prefHeightProperty().bind(middle.prefHeightProperty());*/
+
 
         StackPane center=new StackPane();
-
         center.prefHeightProperty().bind(middle.prefHeightProperty());
-        center.setStyle("-fx-background-color: #0000FF");
+       center.setStyle("-fx-background-color: #F5F5F5");
         center.getChildren().addAll(tabPane);
 
         StackPane right=new StackPane();
-        TableView tableView=new TableView();
+
+
+
+
+
         right.prefHeightProperty().bind(middle.prefHeightProperty());
-        right.setStyle("-fx-background-color: #0000FF");
+  //      right.setStyle("-fx-background-color: #0000FF");
         right.getChildren().addAll(tableView);
 
 
@@ -233,14 +345,13 @@ public class LayOut extends Application {
         /**
          * 组件的操作-------------------------------------------------------------------------------------------
          */
-        treeview.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+/*        treeview.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             sampleBreadCrumbBar.selectedCrumbProperty().set(newValue);
-          /*  if (currentSelectItem != null && currentSelectItem.getValue() .equals("三级目录")) {
+            if (currentSelectItem != null && currentSelectItem.getValue() .equals("三级目录")) {
                 System.out.println("selection(" + ((TreeItem<String>) newValue).getValue() + ") change");
                 tabPane.getSelectionModel().select(tab1);
             }
-           */
-        });
+        });*/
         /**
          * 菜单按钮-----------------------------------------------------------------------------------------------
          */
@@ -259,22 +370,31 @@ public class LayOut extends Application {
                 System.out.println(newValue.getText());
             }
         });
-        tab1.setOnSelectionChanged(new EventHandler<Event>() {
+/*        tab1.setOnSelectionChanged(new EventHandler<Event>() {
             @Override
             public void handle(Event event) {
                 Tab t = (Tab) event.getSource();
                 System.out.println("变化的是" + t.getText());
             }
-        });
-        uneditableComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (newValue=="算法 1")
-                {
-                    new Thread(() -> Algorithm1.start()).start();
-                }
+        });*/
+        jfxCombo.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
+            if (newValue=="算法 1")
+            {
+                new Thread(() -> Algorithm.start()).start();
+                // Algorithm1.start();
             }
-        });
+                }
+        );
+
+
+/*        uneditableComboBox.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+            if (newValue=="算法 1")
+            {
+                new Thread(() -> Algorithm.start()).start();
+               // Algorithm1.start();
+            }
+        });*/
+
 //        an.setOnMouseClicked(new EventHandler<MouseEvent>() {
 //            @Override
 //           public void handle(MouseEvent event) {
@@ -336,13 +456,6 @@ public class LayOut extends Application {
                                     new XYChart.Data<Double,Double>(2.2, 1.9),
                                     new XYChart.Data<Double,Double>(2.7, 2.3),
                                     new XYChart.Data<Double,Double>(2.9, 0.5)
-                            )),
-                            new LineChart.Series<Double,Double>("Series 2", FXCollections.observableArrayList(
-                                    new XYChart.Data<Double,Double>(0.0, 1.6),
-                                    new XYChart.Data<Double,Double>(0.8, 0.4),
-                                    new XYChart.Data<Double,Double>(1.4, 2.9),
-                                    new XYChart.Data<Double,Double>(2.1, 1.3),
-                                    new XYChart.Data<Double,Double>(2.6, 0.9)
                             ))
                     );
                     LineChart chart = new LineChart(xAxis, yAxis, lineChartData);
@@ -359,7 +472,7 @@ public class LayOut extends Application {
                 System.out.println(newValue);
             }
         });
-        textArea.setText("历史输入：");
+     //   textArea.setText("历史输入：");
         // treeview.getSelectionModel().selectedItemProperty().addListener();
 
     }

@@ -13,20 +13,18 @@ import java.util.List;
 public  class TxtRead {
     public static  MWNumericArray y;
     public  static List<Double> y1 = new ArrayList<Double>();
+    public static Double[] array;
     public static void readFile1(String filePath1)
     {
         String filePath = filePath1;
         readFile2(filePath);
         int size=y1.size();
-        //  y = new MWNumericArray(y1,MWClassID.DOUBLE);
-        Double[] array = y1.toArray(new Double[size]);
-        //    y = new MWNumericArray(y1,MWClassID.DOUBLE);
+        array = y1.toArray(new Double[size]);
         for (Double aDouble : array) {
             System.out.println(aDouble);
         }
-
         y = new MWNumericArray(array, MWClassID.DOUBLE);
-        y1.clear();
+        //y1.clear();
     }
     public static void readFile2(String filePath)
     {
